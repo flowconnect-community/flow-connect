@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLOW CONNECT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+        :root {
+            --color-bg: #1e1e1e;
+            --color-text: #ffffff;
+            --highlight-gradient: linear-gradient(to right, #F19A5C, #F9DB6F);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans KR', sans-serif; }
+        
+        body { 
+            background-color: var(--color-bg); 
+            color: var(--color-text); 
+            width: 100%; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden; 
+        }
+        
+        a { text-decoration: none; color: inherit; }
+
+        .highlight-text {
+            background: var(--highlight-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* Hero Section */
+        .hero { 
+            position: relative; 
+            height: 100vh; 
+            width: 100%;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        .hero-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('webbackground.jpg') !important; 
+            background-size: cover; 
+            background-position: center center; 
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
+        .hero-bg::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); }
+        .hero-content h2 { font-size: 1.5rem; font-weight: 400; margin-bottom: 55px; } 
+
+        .btn-auth {
+            background-color: #ffffff; color: #000000; padding: 12px 50px; border-radius: 30px; font-size: 1.1rem;
+            font-weight: bold; border: none; cursor: pointer; animation: blink 1.5s infinite; transition: 0.3s;
+        }
+
+        .section-container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 100px 20px; border-bottom: 1px solid #333; }
+        .section-title { font-size: 2rem; margin-bottom: 10px; font-weight: 700; }
+        .section-desc { font-size: 1.1rem; color: #ccc; margin-bottom: 40px; }
+
+        /* 문의 섹션 */
+        .contact-cards { display: flex; gap: 20px; justify-content: center; }
+        .contact-card {
+            background-color: rgba(46, 46, 46, 0.6); 
+            width: 197px; height: 285px; border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .gmail-text { font-size: 10.5px !important; color: #F19A5C; white-space: nowrap; letter-spacing: -0.2px; padding: 0 10px; }
+
+        /* 스크롤 애니메이션 공통 */
+        .scroll-trigger-section { height: 250vh; position: relative; width: 100%; }
+        .sticky-wrapper { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; max-width: 1100px; margin: 0 auto; }
+        .scroll-fade-item { opacity: 0; transform: translateY(30px); transition: 0.8s ease; }
+        .scroll-fade-item.active { opacity: 1; transform: translateY(0); }
+
+        .grid-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 30px; }
+        .grid-cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; }
+        
+        .info-card { background: linear-gradient(135deg, #333, #1a1a1a); padding: 30px 20px; border-radius: 8px; min-height: 220px; border: 1px solid #444; transition: 0.3s; }
+        .info-card.clickable:hover { border-color: #F19A5C; transform: translateY(-5px); background: linear-gradient(135deg, #444, #222); }
+        .info-card.highlight-card { background: var(--highlight-gradient); color: #111; border: none; }
+        .info-card h4 { margin-bottom: 15px; font-size: 1rem; }
+        .info-card p { font-size: 0.85rem; line-height: 1.6; color: #bbb; }
+        .highlight-card p { color: #222; font-weight: 500; }
+
+        /* 단독 카드용 스타일 */
+        .single-card-wrapper { display: flex; justify-content: center; margin-top: 30px; }
+        .single-card { width: 100%; max-width: 400px; text-align: center; }
+
+        /* 모달 및 푸터 생략 스타일 동일 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box { background: #ffffff; width: 300px; padding: 40px 25px; border-radius: 15px; text-align: center; color: #1a1a1a; display: none; }
+        .modal-box.active { display: block; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem; outline: none; background: #f9f9f9; }
+        .btn-submit { width: 100%; background-color: #000; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        footer { border-top: 1px solid #333; padding: 60px 0; font-size: 0.8rem; color: #888; width: 100%; }
+        .footer-content { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 20px; }
+        .footer-left { flex: 1.2; }
+        .footer-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .footer-table th, .footer-table td { border: 1px solid #444; padding: 8px; text-align: center; font-size: 0.75rem; }
+        .footer-right { flex: 0.8; text-align: right; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <p>Communication/Data Sharing</p>
+            <h1><span class="highlight-text">FLOW CONNECT</span></h1>
+            <h2>FLOW CONNECT의 새로운 소식을 확인하세요!</h2>
+            <button id="mainAuthBtn" class="btn-auth" onclick="handleAuthButtonClick()">LOGIN</button>
+        </div>
+    </section>
+
+    <section class="section-container" style="text-align: center;">
+        <h2 class="section-title"><span class="highlight-text">FLOW CONNECT</span>에 대해 궁금하신점이 있나요?</h2>
+        <p class="section-desc">아래 카드를 탭하여 문의하세요!</p>
+        <div class="contact-cards">
+            <a href="https://www.instagram.com/flowkr_chat" target="_blank" class="contact-card">
+                <h3>Instagram</h3>
+                <p style="color:#F19A5C;">flowkr_chat</p>
+            </a>
+            <a href="mailto:flowemconnect.support@gmail.com" class="contact-card">
+                <h3>Gmail</h3>
+                <p class="gmail-text">flowemconnect.support@gmail.com</p>
+            </a>
+        </div>
+    </section>
+
+    <section class="scroll-trigger-section" id="system-section">
+        <div class="sticky-wrapper">
+            <div class="scroll-fade-item" data-step="0">
+                <h2 class="section-title">시스템 소개</h2>
+                <p class="section-desc"><span class="highlight-text">FLOW CONNECT</span>는 다음과 같이 4개의 주요시스템을 구성하여 운영합니다.</p>
+            </div>
+            <div class="grid-cards">
+                <div class="info-card scroll-fade-item" data-step="1"><h4>1.회원 등급제</h4><p>FLOW CONNECT는 3개의 회원등급으로 분류하여 커뮤니티의 혼란을 방지합니다.</p></div>
+                <div class="info-card scroll-fade-item" data-step="2"><h4>2.FLOW CHAT</h4><p>기존 email방식의 문의와 함께 운영하여 이용자 몰림으로 인한 혼란을 방지하고, 빠른 답장이 가능합니다.</p></div>
+                <div class="info-card scroll-fade-item" data-step="3"><h4>3.DATA SHARING</h4><p>FLOW CONNECT의 커뮤니티 카페를 운영하여 자료 공유가 가능합니다.</p></div>
+                <div class="info-card scroll-fade-item" data-step="4"><h4>4.COMMUNITY GUIDE LINE</h4><p>FLOW CONNECT는 편안하고 안전한 커뮤니티 카페 이용을 위해 지켜야할 규정을 만들었습니다.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="scroll-trigger-section" id="tier-section">
+        <div class="sticky-wrapper">
+            <div class="scroll-fade-item" data-step="0">
+                <h2 class="section-title">회원 등급제</h2>
+                <p class="section-desc"><span class="highlight-text">FLOW CONNECT</span>는 3개의 회원 등급으로 구성하여 운영합니다.</p>
+            </div>
+            <div class="grid-cards-3">
+                <div class="info-card scroll-fade-item" data-step="1"><h4>Public</h4><p>-Public 커뮤니티 게시물 열람 가능<br>-이벤트 응모 가능</p></div>
+                <div class="info-card scroll-fade-item" data-step="2"><h4>FLOW CONNECT</h4><p>-CONNECT 전용 커뮤니티 게시물 열람 가능<br>-이벤트 응모 가능<br>-이벤트 사전 응모 2순위</p></div>
+                <div class="info-card highlight-card scroll-fade-item" data-step="3"><h4>AG PARTNERS</h4><p>-AG 전용 커뮤니티 게시물 열람 가능<br>-이벤트 자동 응모<br>-이벤트 사전 응모 1순위</p></div>
+            </div>
+        </div>
+    </section>
+
+   <section class="section-container" style="text-align: center; padding-top: 50px;">
+        <h2 class="section-title"><span class="highlight-text">커뮤니티</span></h2>
+        <p class="section-desc">FLOW COMMUNITY CAFE</p>
+        <div class="single-card-wrapper">
+            <a href="https://naver.me/FK5AFFJu?tc=shared_link" target="_blank" class="info-card single-card clickable">
+                <h4 style="color:#F19A5C; font-size: 1.2rem;">커뮤니티 바로가기</h4>
+                <p>FLOW CONNECT 카페에서<br>더 많은 게시물을 확인하세요.</p>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <h4 style="color:#ccc; margin-bottom:5px;">FLOW CONNECT 회원가입 정보 수집 안내</h4>
+                <p>1.정보 수집 및 이용 목적<br>개인정보 보호 규정 및 법률에 의거 회원의 정보를 보호하고 권리를 보장한다.</p>
+                <table class="footer-table">
+                    <tr><th>항목</th><th>목적</th><th>보유 기간</th><th>보관 수단</th></tr>
+                    <tr><td>email<br>Connect비밀번호</td><td>회원 식별, 본인인증, 계정 보안</td><td>회원 가입일자 ~ 탈퇴이후 30일</td><td>firebase DB</td></tr>
+                </table>
+                <p>1.회원 본인은 정보 수집 및 이용에 거부할 수 있습니다.<br>2.수집된 정보는 목적 이외의 용도로 이용하지 않습니다.<br>3.탈퇴 이후 30일 후 정보는 자동으로 삭제되며 본인에게 알립니다.<br>4.만 14세 미만의 회원도 가입이 가능합니다.</p>
+            </div>
+            <div class="footer-right">
+                <h4>2.회원의 권리</h4>
+                <p>회원은 언제든지 정보 열람, 정정, 삭제를 요구할 수 있습니다.</p>
+                <h4 style="margin-top:20px;">3.문의및 권리 요구 방법</h4>
+                <p style="color:#F19A5C;">Instagram: flowkr_chat<br>Gmail: flowemconnect.support@gmail.com</p>
+                <p style="margin-top:50px; font-weight:bold; color:#fff;">FLOW CONNECT COMMUNITY</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="window.closeModalOnOutside(event)">
+        <div class="modal-box" id="modal-login">
+            <h2 style="margin-bottom:20px;">LOGIN</h2>
+            <form onsubmit="window.handleLogin(event)">
+                <div class="input-group"><input type="email" id="loginEmail" placeholder="Email" required></div>
+                <div class="input-group"><input type="password" id="loginPassword" placeholder="Password" required></div>
+                <button type="submit" class="btn-submit">Sign In</button>
+            </form>
+            <p style="font-size:0.75rem; margin-top:20px;">New? <span onclick="window.openModal('signup')" style="color:#F19A5C; cursor:pointer; font-weight:bold;">Create Account</span></p>
+        </div>
+        <div class="modal-box" id="modal-signup">
+            <h2>SIGN UP</h2>
+            <form onsubmit="window.handleSignup(event)">
+                <div class="input-group"><input type="email" id="signupEmail" placeholder="Email" required></div>
+                <div class="input-group"><input type="password" id="signupPassword" placeholder="Password" required></div>
+                <div style="font-size:0.7rem; margin-bottom:10px;"><input type="checkbox" id="agreeCheck"> 정보 수집 동의</div>
+                <button type="submit" class="btn-submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD2s6gqvAku_PZ-wXqeqQP1dH7kofuIGko", authDomain: "flow-cm.firebaseapp.com", projectId: "flow-cm", storageBucket: "flow-cm.firebasestorage.app", messagingSenderId: "1073099888375", appId: "1:1073099888375:web:30efcdcb52479a350d25f2" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const authBtn = document.getElementById('mainAuthBtn');
+
+        onAuthStateChanged(auth, (user) => { authBtn.innerText = user ? "LOGOUT" : "LOGIN"; });
+        window.handleAuthButtonClick = () => { if (authBtn.innerText === "LOGOUT") signOut(auth); else window.openModal('login'); };
+
+        const overlay = document.getElementById('modalOverlay');
+        window.openModal = (type) => {
+            overlay.classList.add('active');
+            document.getElementById('modal-login').classList.toggle('active', type === 'login');
+            document.getElementById('modal-signup').classList.toggle('active', type === 'signup');
+        };
+        window.closeModal = () => overlay.classList.remove('active');
+        window.closeModalOnOutside = (e) => { if(e.target === overlay) window.closeModal(); };
+
+        window.handleLogin = async (e) => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value); window.closeModal(); } catch (err) { alert("로그인 실패!"); } };
+        window.handleSignup = async (e) => { e.preventDefault(); if(!agreeCheck.checked) return alert("동의 필요!"); try { await createUserWithEmailAndPassword(auth, signupEmail.value, signupPassword.value); window.closeModal(); } catch (err) { alert(err.message); } };
+
+        function setupScrollAnimation(sectionId) {
+            const section = document.getElementById(sectionId);
+            const items = section.querySelectorAll('.scroll-fade-item');
+            window.addEventListener('scroll', () => {
+                const rect = section.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                let progress = 0;
+                if (rect.top <= 0) progress = Math.abs(rect.top) / (rect.height - windowHeight);
+                items.forEach(item => {
+                    if (progress >= parseInt(item.getAttribute('data-step')) * 0.18) item.classList.add('active');
+                    else item.classList.remove('active');
+                });
+            });
+        }
+        setupScrollAnimation('system-section');
+        setupScrollAnimation('tier-section');
+    </script>
+</body>
+</html>
